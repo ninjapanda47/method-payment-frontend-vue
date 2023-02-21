@@ -1,6 +1,6 @@
 <template>
   <v-app-bar color="#002626">
-    <v-app-bar-title>
+    <v-app-bar-title @click="this.$router.push({name: 'Home'})">
       <v-img src="@/assets/logo.png" height="32" width="130"/>
     </v-app-bar-title>
     <v-btn

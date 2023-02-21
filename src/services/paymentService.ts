@@ -6,10 +6,9 @@ export const uploadPaymentsToBatch = async (batchId: string, file: File) => {
   const formData = new FormData();
   formData.append("file", file);
   formData.append("batchId", batchId);
-  // @ts-ignore
   let response = await fetch(`${api}/upload`, {
     method: "POST",
-    body: formData,
+    body: formData as any,
   });
   return await response.json();
 };

@@ -8,10 +8,11 @@
           </v-card-title
           >
           <v-card-text class="my-4 text-center">
-            <v-form class="mx-5 text-left">
-              <v-text-field label="BatchId" v-model="batchId"></v-text-field>
-              <v-file-input accept="xml/*" label="File input" ref="file" v-on:change="handleFileUpload($event)"
-                            type="file"></v-file-input>
+            <v-form class="mx-5 text-left" ref="form">
+              <v-text-field label="BatchId" v-model="batchId" :rules="batchIdRules" required></v-text-field>
+              <v-file-input accept="xml/*" label="File input" :rules="fileRules" ref="file"
+                            v-on:change="handleFileUpload($event)"
+                            type="file" required></v-file-input>
             </v-form>
             <v-btn color="primary" class="mx-auto text-center" @click="upload"> Submit</v-btn>
           </v-card-text>
@@ -22,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent} from "vue";
+import Vue, {defineComponent} from "vue";
 import {useAppStore} from "@/store/app";
 
 export default defineComponent({
@@ -36,7 +37,23 @@ export default defineComponent({
   data() {
     return {
       file: {} as File,
-      batchId: ''
+      fileRules: [
+        (value: any) => {
+          if (value[0].type ===
+            "text/xml") {
+            return true
+          } else {
+            return 'Please Upload an text/xml file'
+          }
+        }
+      ],
+      batchId: '',
+      batchIdRules: [
+        (value: string) => {
+          if (value) return true
+          return 'Name is requred.'
+        },
+      ]
     };
   },
   methods: {
@@ -48,8 +65,10 @@ export default defineComponent({
 
     },
     async upload() {
-      if (this.file) {
+      const {valid} = await (this.$refs.form as any).validate()
+      if (valid) {
         await this.appStore.uploadPayments(this.batchId, this.file);
+        (this.$refs.form as any).resetValidation()
         this.$router.push({name: 'Batch', params: {batchId: this.appStore.batch?.batchId}})
       }
     },
